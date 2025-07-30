@@ -13,3 +13,11 @@ void Manager::changePriority(int index, int what) {
 }
 
 void Manager::changeCategory(int index, const std::string& category) { getVec().at(index)->setCategory(category); }
+
+void Manager::changeDone(int index) { 
+	(getVec().at(index)->getDone() == true) ? getVec().at(index)->setDone(false) : getVec().at(index)->setDone(true);
+}
+
+void Manager::stringToTP(int day, int month, int year, int hour, int minute) {
+
+}

@@ -18,6 +18,9 @@ public:
 	void changeNameORDesc(int index, int what, const std::string& name);
 	void changePriority(int index, int what);
 	void changeCategory(int index, const std::string& category);
+	void changeDone(int index);
+
+	void stringToTP(int day, int month, int year, int hour, int minute);
 };
 
 #endif

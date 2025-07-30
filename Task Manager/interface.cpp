@@ -1,6 +1,6 @@
 #include "interface.h"
 #include <iostream>
-
+#include <sstream>
 
 int validChoice(int min, int max) {
     int choice;
@@ -183,4 +183,45 @@ void IF_edit(Manager& manager) {
     }
     }
     std::cout << "\nTask '" << name << "' changed.\n\n";
+}
+
+void IF_done(Manager& manager) {
+    int size = manager.getVec().size();
+    int choice;
+    showTasks(manager);
+    std::cout << "[0] Return";
+    std::cout << "\n\nSelect the task which readiness you want to change: ";
+
+    try { choice = validChoice(0, size); }
+    catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
+
+    if (choice == 0) return;
+    choice--;
+    manager.changeDone(choice);
+    
+    std::cout << "\nTask changed to " << ((manager.getVec()[choice]->getDone() == 1) ? "done" : "not done") << ".\n\n";
+}
+
+void IF_getDate(Manager& manager) {
+    std::string line;
+    int day, month, year, hour, minute;
+    std::cout << "\nEnter the deadline date in the appropriate format (DD-MM-YYYY,HH:MM): ";
+
+    std::string temp;
+    std::getline(std::cin, line);
+    std::stringstream ss(line);
+
+    std::getline(ss, temp, '-');
+    day = std::stoi(temp);
+    std::getline(ss, temp, '-');
+    month = std::stoi(temp);
+    std::getline(ss, temp, ',');
+    year = std::stoi(temp);
+
+    std::getline(ss, temp, ':');
+    hour = std::stoi(temp);
+    std::getline(ss, temp);
+    minute = std::stoi(temp);
+
+    manager.stringToTP(day, month, year, hour, minute);
 }
