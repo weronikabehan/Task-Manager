@@ -67,7 +67,7 @@ std::string chooseExistingCategory(Manager& manager) {
         int choice;
         std::cout << "Select which category do you choose: ";
         try { choice = validChoice(1, categories.size()); }
-        catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
+        catch (std::exception& e) { std::cout << "Error: " << e.what(); return "\n\n"; }
 
         choice--;
         std::string chosen = categories.at(choice);
@@ -97,7 +97,7 @@ void IF_delete(Manager& manager) {
     std::cout << "\n\nChoose task to delete: ";
 
     try { choice = validChoice(0, size); }
-    catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
+    catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
 
     if (choice == 0) return;
 
@@ -118,7 +118,7 @@ void IF_edit(Manager& manager) {
     std::cout << "\n\nChoose task to edit: ";
 
     try { index = validChoice(0, size); }
-    catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
+    catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
 
     if (index == 0) return;
 
@@ -127,12 +127,14 @@ void IF_edit(Manager& manager) {
     std::cout << "\n    [1] Change name\n    [2] Change description\n    [3] Change category\n    [4] Change priority\n    "
         << "[5] Deadline\n    [0] Return\n    Your choice : ";
     try { choice1 = validChoice(0, 5); }
-    catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
+    catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
+    std::cout << "\n\n";
     if (choice1 == 0) return;
 
-    std::cout << "\n    [1] Edit\n    [2] Delete\n    [0] Return\n    Your choice: ";
+    std::cout << "    [1] Edit\n    [2] Delete\n    [0] Return\n    Your choice: ";
     try { choice2 = validChoice(0, 2); }
-    catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
+    catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
+    std::cout << "\n\n";
     if (choice2 == 0) return;
 
 
@@ -152,8 +154,8 @@ void IF_edit(Manager& manager) {
                 std::cout << "\nIf you delete a task name, that task will be completely deleted. Is that what you want?\n[1] Yes\n[2] No\nYour choice: ";
 
                 try { what = validChoice(1, 2); }
-                catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
-
+                catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
+                std::cout << "\n\n";
                 if (what == 1) manager.deleteTask(index);
                 else return;
             }
@@ -167,8 +169,8 @@ void IF_edit(Manager& manager) {
             std::cout << "Do you want to:\n[1] Add to existing category\n[2] Create a new category\nYour choice: ";
 
             try { what = validChoice(1, 2); }
-            catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
-
+            catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
+            std::cout << "\n\n";
             if (what == 1) manager.changeCategory(index, chooseExistingCategory(manager));
             else if (what == 2) {
                 std::string cat;
@@ -187,8 +189,8 @@ void IF_edit(Manager& manager) {
             std::cout << "Choose the priority:\n[1] ASAP\n[2] Later\n[3] Whenever\nYour choice: ";
 
             try { what = validChoice(1, 3); }
-            catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
-
+            catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
+            std::cout << "\n\n";
             manager.changePriority(index, what);
         }
         else manager.getVec().at(index)->setPriority(prio::Whenever);
@@ -211,7 +213,7 @@ void IF_done(Manager& manager) {
     std::cout << "\n\nSelect the task which readiness you want to change: ";
 
     try { choice = validChoice(0, size); }
-    catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
+    catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
 
     if (choice == 0) return;
     choice--;
@@ -227,7 +229,7 @@ void IF_getDate(Manager& manager, int index) {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     while (true) {
-        std::cout << "\nEnter the deadline date in the format (DD-MM-YYYY,HH:MM): ";
+        std::cout << "Enter the deadline date in the format (DD-MM-YYYY,HH:MM): ";
         std::getline(std::cin, line);
         std::stringstream ss(line);
         std::string temp;
@@ -253,9 +255,7 @@ void IF_getDate(Manager& manager, int index) {
 
             break;
         }
-        catch (const std::exception& e) {
-            std::cerr << "Invalid input format or value: " << e.what() << ". Please try again.\n";
-        }
+        catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; return; }
 
     }
     manager.setTPfromSTR(day, month, year, hour, minute, index);

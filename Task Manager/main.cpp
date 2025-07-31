@@ -17,15 +17,12 @@ int main() {
 
     do {
         showMenu();
-
+        
         try {
             choice = validChoice(0, 5);
         }
-        catch (std::exception& e) {
-            std::cout << "Error: " << e.what() << '\n';
-            continue;
-        }
-
+        catch (std::exception& e) { std::cout << "Error: " << e.what() << "\n\n"; continue; }
+        std::cout << "\n\n";
         switch (choice) {
         case 1: IF_add(manager); break;
         case 2: IF_delete(manager); break;
