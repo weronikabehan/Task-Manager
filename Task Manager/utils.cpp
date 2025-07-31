@@ -56,3 +56,18 @@ std::string deadlineToString(std::chrono::system_clock::time_point tp) {
 
     return oss.str();
 }
+
+std::string formatDeadline(const system_clock::time_point& tp) {
+    std::time_t time = system_clock::to_time_t(tp);
+    std::tm* tm = std::localtime(&time);
+
+    std::ostringstream oss;
+    oss << std::setfill('0')
+        << std::setw(2) << tm->tm_mday << "-"
+        << std::setw(2) << tm->tm_mon + 1 << "-"
+        << (tm->tm_year + 1900) << ","
+        << std::setw(2) << tm->tm_hour << ":"
+        << std::setw(2) << tm->tm_min;
+
+    return oss.str();
+}

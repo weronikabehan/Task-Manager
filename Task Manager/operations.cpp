@@ -10,7 +10,8 @@ void Operation::save(const std::string& fileName) {
 	
 	for (auto& t : manager.getVec()) {
 		file << t->getName() << ';' << t->getDone() << ';' << t->getDescription() << ';'
-			<< t->getCategory() << ';' << priorityToString(t->getPriority()) << std::endl;
+			<< t->getCategory() << ';' << priorityToString(t->getPriority()) << ';' <<
+			formatDeadline(t->getDeadline()) << std::endl;
 	}
 
 	file.close();
@@ -22,7 +23,7 @@ void Operation::load(const std::string& fileName) {
 
 	std::string line;
 	while (std::getline(file, line)) {
-		std::string name, description, category, prioritySTR, doneSTR;
+		std::string name, description, category, prioritySTR, doneSTR, deadlineSTR;
 		std::stringstream ss(line);
 
 		std::getline(ss, name, ';');
@@ -30,6 +31,7 @@ void Operation::load(const std::string& fileName) {
 		std::getline(ss, description, ';');
 		std::getline(ss, category, ';');
 		std::getline(ss, prioritySTR, ';');
+		std::getline(ss, deadlineSTR);
 
 		bool done;
 		prio priority;
@@ -45,6 +47,35 @@ void Operation::load(const std::string& fileName) {
 		task->setDone(done);
 		task->setCategory(category);
 		task->setPriority(priority);
+
+		if (!deadlineSTR.empty()) {
+			std::stringstream dateSS(deadlineSTR);
+			std::string temp;
+			int day, month, year, hour, minute;
+
+			std::getline(dateSS, temp, '-');
+			day = std::stoi(temp);
+			std::getline(dateSS, temp, '-');
+			month = std::stoi(temp);
+			std::getline(dateSS, temp, ',');
+			year = std::stoi(temp);
+
+			std::getline(dateSS, temp, ':');
+			hour = std::stoi(temp);
+			std::getline(dateSS, temp);
+			minute = std::stoi(temp);
+
+			std::tm tm = {};
+			tm.tm_year = year - 1900;
+			tm.tm_mon = month - 1;
+			tm.tm_mday = day;
+			tm.tm_hour = hour;
+			tm.tm_min = minute;
+
+			std::time_t time = std::mktime(&tm);
+			system_clock::time_point tp = system_clock::from_time_t(time);
+			task->setDeadline(tp);
+		}
 		
 		manager.getVec().emplace_back(std::move(task));
 	}
