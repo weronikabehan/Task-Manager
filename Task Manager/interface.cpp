@@ -2,6 +2,7 @@
 #include "utils.h"
 #include <iostream>
 #include <sstream>
+#include <unordered_set>
 
 void showMenu() {
     std::cout << "[1] Add task \n[2] Delete task \n[3] Show tasks \n[4] Change status \n[5] Edit task \n\n[0] Exit \n=== Your choice: ";
@@ -48,8 +49,10 @@ void showTasks(Manager& manager) {
 }
 
 std::string chooseExistingCategory(Manager& manager) {
+    std::unordered_set<std::string> uniqueCategories;
     std::vector<std::string> categories;
-    for (auto& i : manager.getVec()) if (i->getCategory() != "--") categories.emplace_back(i->getCategory());
+    for (auto& i : manager.getVec()) if (i->getCategory() != "--") uniqueCategories.insert(i->getCategory());
+    for (std::string c : uniqueCategories) categories.emplace_back(c);
 
     if (categories.empty()) {
         std::cout << "\n\nThere is no categories available.\n\n";
@@ -70,11 +73,13 @@ std::string chooseExistingCategory(Manager& manager) {
         std::string chosen = categories.at(choice);
         return chosen;
     }
+    
 }
 
 void IF_add(Manager& manager) {
     std::string name;
     std::cout << "Name of your new task: ";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, name);
 
     if (name.empty()) throw std::invalid_argument("Name can not be empty!");
