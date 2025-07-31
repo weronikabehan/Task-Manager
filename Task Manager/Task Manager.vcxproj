@@ -130,13 +130,11 @@
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="operations.cpp" />
     <ClCompile Include="operations.h" />
-    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interface.h" />
     <ClInclude Include="task.h" />
     <ClInclude Include="manager.h" />
-    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

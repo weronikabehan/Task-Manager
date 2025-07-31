@@ -20,7 +20,6 @@ public:
 	void changeCategory(int index, const std::string& category);
 	void changeDone(int index);
 
-	void setTPfromSTR(int day, int month, int year, int hour, int minute, int index);
 };
 
 #endif
