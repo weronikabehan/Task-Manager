@@ -1,9 +1,10 @@
 #include "interface.h"
+#include "utils.h"
 #include <iostream>
 #include <sstream>
 
 void showMenu() {
-    std::cout << "\n\n[1] Add task \n[2] Delete task \n[3] Show tasks \n[4] Change status \n[5] Edit task \n\n[0] Exit \n=== Your choice: ";
+    std::cout << "[1] Add task \n[2] Delete task \n[3] Show tasks \n[4] Change status \n[5] Edit task \n\n[0] Exit \n=== Your choice: ";
 }
 
 int validChoice(int min, int max) {
@@ -11,7 +12,7 @@ int validChoice(int min, int max) {
     while (true) {
         if (std::cin >> choice) {
             if (choice >= min && choice <= max) return choice;
-            else throw std::out_of_range ("Your choice is out of range. Please try again.");
+            else throw std::out_of_range("Your choice is out of range. Please try again.");
         }
         else {
             std::cin.clear();
@@ -26,7 +27,7 @@ void showTasks(Manager& manager) {
     std::cout << "=====================================================\n";
 
     if (manager.getVec().empty()) {
-        std::cout << "\nNo tasks available.\n";
+        std::cout << "No tasks available.\n";
     }
     else {
         std::cout << "\nList of tasks:\n\n";
@@ -37,7 +38,9 @@ void showTasks(Manager& manager) {
                 << " [ " << (t->getDone() ? "Done" : "Not done") << " ] \n"
                 << "     Description: " << t->getDescription() << "\n"
                 << "     Category   : " << t->getCategory() << "\n"
-                << "     Priority   : " << t->priorityToString(t->getPriority()) << "\n\n";
+                << "     Priority   : " << priorityToString(t->getPriority()) << "\n"
+                << "     Deadline in: " << deadlineToString(t->getDeadline())
+                << "\n\n";
         }
     }
 
@@ -70,14 +73,14 @@ std::string chooseExistingCategory(Manager& manager) {
 }
 
 void IF_add(Manager& manager) {
-	std::string name;
-	std::cout << "Name of your new task: ";
-	std::getline(std::cin, name);
-	
-	if (name.empty()) throw std::invalid_argument("Name can not be empty!");
+    std::string name;
+    std::cout << "Name of your new task: ";
+    std::getline(std::cin, name);
 
-	manager.addTask(name);
-	std::cout << "\nTask '" << name << "' successfully added.\n\n";
+    if (name.empty()) throw std::invalid_argument("Name can not be empty!");
+
+    manager.addTask(name);
+    std::cout << "\nTask '" << name << "' successfully added.\n\n";
 }
 
 void IF_delete(Manager& manager) {
@@ -116,8 +119,9 @@ void IF_edit(Manager& manager) {
 
     index--;
     std::string name = manager.getVec().at(index)->getName();
-    std::cout << "\n    [1] Change name\n    [2] Change description\n    [3] Change category\n    [4] Change priority\n    [0] Return\n    Your choice : ";
-    try { choice1 = validChoice(0, 4); }
+    std::cout << "\n    [1] Change name\n    [2] Change description\n    [3] Change category\n    [4] Change priority\n    "
+        << "[5] Deadline\n    [0] Return\n    Your choice : ";
+    try { choice1 = validChoice(0, 5); }
     catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
     if (choice1 == 0) return;
 
@@ -161,7 +165,7 @@ void IF_edit(Manager& manager) {
             catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
 
             if (what == 1) manager.changeCategory(index, chooseExistingCategory(manager));
-            else if(what == 2) {
+            else if (what == 2) {
                 std::string cat;
                 std::cout << "\nEnter new category: ";
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -185,6 +189,11 @@ void IF_edit(Manager& manager) {
         else manager.getVec().at(index)->setPriority(prio::Whenever);
         break;
     }
+    case 5: {
+        if (choice2 == 1) IF_getDate(manager, index);
+        else manager.getVec()[index]->setDeadline(system_clock::time_point{});
+        break;
+    }
     }
     std::cout << "\nTask '" << name << "' changed.\n\n";
 }
@@ -202,7 +211,47 @@ void IF_done(Manager& manager) {
     if (choice == 0) return;
     choice--;
     manager.changeDone(choice);
-    
+
     std::cout << "\nTask changed to " << ((manager.getVec()[choice]->getDone() == 1) ? "done" : "not done") << ".\n\n";
 }
 
+void IF_getDate(Manager& manager, int index) {
+    std::string line;
+    int day, month, year, hour, minute;
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    while (true) {
+        std::cout << "\nEnter the deadline date in the format (DD-MM-YYYY,HH:MM): ";
+        std::getline(std::cin, line);
+        std::stringstream ss(line);
+        std::string temp;
+
+        try {
+            std::getline(ss, temp, '-');
+            day = std::stoi(temp);
+            std::getline(ss, temp, '-');
+            month = std::stoi(temp);
+            std::getline(ss, temp, ',');
+            year = std::stoi(temp);
+
+            std::getline(ss, temp, ':');
+            hour = std::stoi(temp);
+            std::getline(ss, temp);
+            minute = std::stoi(temp);
+
+            if (day < 1 || day > 31) throw std::out_of_range("Invalid day");
+            if (month < 1 || month > 12) throw std::out_of_range("Invalid month");
+            if (year < 1900) throw std::out_of_range("Invalid year");
+            if (hour < 0 || hour > 23) throw std::out_of_range("Invalid hour");
+            if (minute < 0 || minute > 59) throw std::out_of_range("Invalid minute");
+
+            break;
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Invalid input format or value: " << e.what() << ". Please try again.\n";
+        }
+
+    }
+    manager.setTPfromSTR(day, month, year, hour, minute, index);
+}

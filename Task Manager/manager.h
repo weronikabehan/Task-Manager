@@ -14,12 +14,13 @@ public:
 
 	void addTask(std::string n) { vecTask.emplace_back(std::make_unique<Task>(std::move(n))); }
 	void deleteTask(int index) { vecTask.erase(vecTask.begin() + index); }
-	
+
 	void changeNameORDesc(int index, int what, const std::string& name);
 	void changePriority(int index, int what);
 	void changeCategory(int index, const std::string& category);
 	void changeDone(int index);
 
+	void setTPfromSTR(int day, int month, int year, int hour, int minute, int index);
 };
 
 #endif

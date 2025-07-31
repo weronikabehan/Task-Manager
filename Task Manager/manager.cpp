@@ -14,6 +14,20 @@ void Manager::changePriority(int index, int what) {
 
 void Manager::changeCategory(int index, const std::string& category) { getVec().at(index)->setCategory(category); }
 
-void Manager::changeDone(int index) { 
+void Manager::changeDone(int index) {
 	(getVec().at(index)->getDone() == true) ? getVec().at(index)->setDone(false) : getVec().at(index)->setDone(true);
+}
+
+void Manager::setTPfromSTR(int day, int month, int year, int hour, int minute, int index) {
+	std::tm tm = {};
+
+	tm.tm_year = year - 1900;
+	tm.tm_mon = month - 1;
+	tm.tm_mday = day;
+	tm.tm_hour = hour;
+	tm.tm_min = minute;
+
+	std::time_t time = std::mktime(&tm);
+	system_clock::time_point tp = system_clock::from_time_t(time);
+	getVec().at(index)->setDeadline(tp);
 }
