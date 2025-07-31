@@ -1,4 +1,5 @@
 #include "operations.h"
+#include "utils.h"
 
 #include <fstream>
 #include <sstream>
@@ -9,7 +10,7 @@ void Operation::save(const std::string& fileName) {
 	
 	for (auto& t : manager.getVec()) {
 		file << t->getName() << ';' << t->getDone() << ';' << t->getDescription() << ';'
-			<< t->getCategory() << ';' << t->priorityToString(t->getPriority()) << std::endl;
+			<< t->getCategory() << ';' << priorityToString(t->getPriority()) << std::endl;
 	}
 
 	file.close();
@@ -45,7 +46,7 @@ void Operation::load(const std::string& fileName) {
 		task->setCategory(category);
 		task->setPriority(priority);
 		
-		manager.getVec().emplace_back(task);
+		manager.getVec().emplace_back(std::move(task));
 	}
 }
 

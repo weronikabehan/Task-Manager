@@ -1,4 +1,5 @@
 #include "interface.h"
+#include "utils.h"
 #include <iostream>
 #include <sstream>
 
@@ -33,7 +34,9 @@ void showTasks(Manager& manager) {
                 << " [ " << (t->getDone() ? "Done" : "Not done") << " ] \n"
                 << "     Description: " << t->getDescription() << "\n"
                 << "     Category   : " << t->getCategory() << "\n"
-                << "     Priority   : " << t->priorityToString(t->getPriority()) << "\n\n";
+                << "     Priority   : " << priorityToString(t->getPriority()) << "\n"
+                << "     Deadline in: " << deadlineToString(t->getDeadline())
+                << "\n\n";
         }
     }
 
@@ -112,8 +115,9 @@ void IF_edit(Manager& manager) {
 
     index--;
     std::string name = manager.getVec().at(index)->getName();
-    std::cout << "\n    [1] Change name\n    [2] Change description\n    [3] Change category\n    [4] Change priority\n    [0] Return\n    Your choice: ";
-    try { choice1 = validChoice(0, 4); }
+    std::cout << "\n    [1] Change name\n    [2] Change description\n    [3] Change category\n    [4] Change priority\n    " 
+        << "[5] Deadline\n    [0] Return\n    Your choice : ";
+    try { choice1 = validChoice(0, 5); }
     catch (std::exception& e) { std::cout << "Error: " << e.what() << '\n'; }
     if (choice1 == 0) return;
 
@@ -181,6 +185,11 @@ void IF_edit(Manager& manager) {
         else manager.getVec().at(index)->setPriority(prio::Whenever);
         break;
     }
+    case 5: {
+        if (choice2 == 1) IF_getDate(manager, index);
+        else manager.getVec()[index]->setDeadline(system_clock::time_point{});
+        break;
+    }
     }
     std::cout << "\nTask '" << name << "' changed.\n\n";
 }
@@ -202,26 +211,43 @@ void IF_done(Manager& manager) {
     std::cout << "\nTask changed to " << ((manager.getVec()[choice]->getDone() == 1) ? "done" : "not done") << ".\n\n";
 }
 
-void IF_getDate(Manager& manager) {
+void IF_getDate(Manager& manager, int index) {
     std::string line;
     int day, month, year, hour, minute;
-    std::cout << "\nEnter the deadline date in the appropriate format (DD-MM-YYYY,HH:MM): ";
 
-    std::string temp;
-    std::getline(std::cin, line);
-    std::stringstream ss(line);
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::getline(ss, temp, '-');
-    day = std::stoi(temp);
-    std::getline(ss, temp, '-');
-    month = std::stoi(temp);
-    std::getline(ss, temp, ',');
-    year = std::stoi(temp);
+    while (true) {
+        std::cout << "\nEnter the deadline date in the format (DD-MM-YYYY,HH:MM): ";
+        std::getline(std::cin, line);
+        std::stringstream ss(line);
+        std::string temp;
 
-    std::getline(ss, temp, ':');
-    hour = std::stoi(temp);
-    std::getline(ss, temp);
-    minute = std::stoi(temp);
+        try {
+            std::getline(ss, temp, '-');
+            day = std::stoi(temp);
+            std::getline(ss, temp, '-');
+            month = std::stoi(temp);
+            std::getline(ss, temp, ',');
+            year = std::stoi(temp);
 
-    manager.stringToTP(day, month, year, hour, minute);
+            std::getline(ss, temp, ':');
+            hour = std::stoi(temp);
+            std::getline(ss, temp);
+            minute = std::stoi(temp);
+
+            if (day < 1 || day > 31) throw std::out_of_range("Invalid day");
+            if (month < 1 || month > 12) throw std::out_of_range("Invalid month");
+            if (year < 1900) throw std::out_of_range("Invalid year");
+            if (hour < 0 || hour > 23) throw std::out_of_range("Invalid hour");
+            if (minute < 0 || minute > 59) throw std::out_of_range("Invalid minute");
+
+            break;
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Invalid input format or value: " << e.what() << ". Please try again.\n";
+        }
+
+    }
+    manager.setTPfromSTR(day, month, year, hour, minute, index);
 }

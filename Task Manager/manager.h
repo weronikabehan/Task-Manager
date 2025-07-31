@@ -12,7 +12,7 @@ public:
 	Manager() = default;
 	std::vector<std::unique_ptr<Task>>& getVec() { return vecTask; }
 
-	void addTask(std::string n) { vecTask.emplace_back(std::make_unique<Task>(n)); }
+	void addTask(std::string n) { vecTask.emplace_back(std::make_unique<Task>(std::move(n))); }
 	void deleteTask(int index) { vecTask.erase(vecTask.begin() + index); }
 	
 	void changeNameORDesc(int index, int what, const std::string& name);
@@ -20,7 +20,7 @@ public:
 	void changeCategory(int index, const std::string& category);
 	void changeDone(int index);
 
-	void stringToTP(int day, int month, int year, int hour, int minute);
+	void setTPfromSTR(int day, int month, int year, int hour, int minute, int index);
 };
 
 #endif

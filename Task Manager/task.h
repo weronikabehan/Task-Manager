@@ -3,6 +3,7 @@
 
 #include <string>
 #include <chrono>
+#include <sstream>
 using namespace std::chrono;
 
 enum class prio { ASAP, Later, Whenever };
@@ -16,7 +17,7 @@ private:
 	prio priority;
 	system_clock::time_point deadline;
 public:
-	Task(std::string n) : name(n), description("--"), category("--"), done(false), priority(prio::Whenever) {}
+	Task(std::string n) : name(n), description("--"), category("--"), done(false), priority(prio::Whenever), deadline(system_clock::time_point{}) {}
 
 	void setName(std::string n) { name = n; }
 	void setDescription(std::string d) { description = d; }
@@ -31,14 +32,6 @@ public:
 	bool getDone() const { return done; }
 	prio getPriority() const { return priority; }
 	system_clock::time_point getDeadline() const { return deadline; }
-
-	std::string priorityToString(prio p) {
-		switch (p) {
-		case prio::ASAP: return "ASAP";
-		case prio::Later: return "Later";
-		case prio::Whenever: return "Whenever";
-		}
-	}
 
 	~Task() = default;
 };
